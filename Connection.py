@@ -1,19 +1,24 @@
-import mysql.connector
-import Language as Lang
 import keyboard as kb
+import mysql.connector
 import Dialogues as Dg
+import Language as Lang
 
 
 # Connection---------------------------------
 def connection():
-    mydb = mysql.connector.connect(
+    """Make Connection to the game Database
+
+              Return:\n
+              the connection settings for Database
+              """
+    mysqldb = mysql.connector.connect(
         host="127.0.0.1",
         user="db_user",
         password="db_pass",
         port="3310",
         database="rpg"
     )
-    return mydb
+    return mysqldb
 
 
 # Select------------------------------------
@@ -30,11 +35,8 @@ def select_function(table, where):
           """
     mysqldb = connection()
     dbcursor = mysqldb.cursor()
-
     dbcursor.execute(f"SELECT * FROM {table} WHERE {where}")
-
     dbresult = dbcursor.fetchall()
-
     return dbresult
 
 
@@ -44,11 +46,11 @@ def select_index_inventory(table, where, select):
             Parameters:\n
             table: get the name of the table (Example: name) \n
             where: get the condition to query (Example: Name = 'TEST') \n
-            Select: get the type of select to query (Example: SELECT MAX(column_name) AS maximum) \n
+            Select: get the column name to query (Example: SlotIndex) \n
             How this look in function: SELECT MAX({Select}) AS maximum FROM {table} WHERE {where}  \n
             Example of result: SELECT MAX(SlotIndex) AS maximum FROM inventory WHERE Name = 'TEST'  \n
             Return:\n
-            result of the query
+            result the higher record from column selected
             """
     mysqldb = connection()
     dbcursor = mysqldb.cursor()
@@ -63,6 +65,17 @@ def select_index_inventory(table, where, select):
 # Update------------------------------------
 
 def update_function(table, condition, where):
+    """Make Update in any table of the game Database
+
+          Parameters:\n
+          table: set the name of the table (Example: stats) \n
+          condition: set the column names and values to update (Example: health_points = 120, attack = 60) \n
+          where: set what records to update (Example: Name = 'TEST') \n
+          How this look in function: UPDATE {table} SET {condition} WHERE {where} \n
+          Example of result: UPDATE stats SET health_points = 120, attack = 60 WHERE Name = 'TEST' \n
+          Return:\n
+          result of the query if true then update was successful
+          """
     mysqldb = connection()
 
     dbcursor = mysqldb.cursor()
@@ -77,21 +90,14 @@ def update_function(table, condition, where):
     return success
 
 
-def update_location(name, location):
-    condition = f'Location = {location}'
-    where = f"Name = '{name}'"
-    update_function('name', condition, where)
-    return True
-
-
 # Insert------------------------------------
 def insert_function(table, *arg, **kwargs):
     """Make Insert in any table of the game Database
 
             Parameters:\n
-            table: get the name of the table (Example: Race) \n
-            *arg: get many fields you need to enter in Database (Example: 'Name', 'Race', 'Class') \n
-            **kwargs: get many values you need to enter in Database, need to be the same quantity of *arg \n
+            table: set the name of the table (Example: Race) \n
+            *arg: set many fields you need to enter in Database (Example: 'Name', 'Race', 'Class') \n
+            **kwargs: set many values you need to enter in Database, need to be the same quantity of *arg \n
             (Example: name='Test', race='ELF', class='PALADIN')
             How this look in function: INSERT INTO {table} {final_arg} VALUES ({val}) \n
             Example of result: INSERT INTO Race (Name, Race, Class) VALUES ('Test', 'Elf', 'Paladin') \n
@@ -146,10 +152,10 @@ def login(status, language):
               the function will check if character exists and if the password is correct, if is then log in \n
               if not then character will be created \n
               Return:\n
-              the character name, will be stored in a variable to be called in anothers functions if needed
+              the character name, will be stored in a variable to be called in another's functions if needed
               """
     while status < 1:
-        l, p, log, wrong, success, create_account = Lang.login_text(language)
+        l, p, log, wrong, success, create_account = Lang.login_language(language)
         name = input(str(l))
         pass_w = input(str(p))
         try:
@@ -181,14 +187,20 @@ def login(status, language):
 
 
 def delete_function(table, where):
+    """Delete from in any table of the game Database
+
+              Parameters:\n
+              table: set the name of the table (Example: name) \n
+              where: set what record want to delete (Example: Name = 'TEST') \n
+              How this look in function: DELETE FROM {table} WHERE {where} \n
+              Example of result: DELETE FROM name WHERE Name = 'TEST' \n
+              Return:\n
+              result of the query if true then delete was successful
+              """
     mysqldb = connection()
-
     dbcursor = mysqldb.cursor()
-
     dbcursor.execute(f"DELETE FROM {table} WHERE {where}")
-
     mysqldb.commit()
-
     success = False
     if dbcursor.rowcount > 0:
         success = True

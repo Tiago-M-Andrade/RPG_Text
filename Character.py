@@ -1,7 +1,8 @@
 import time
+import keyboard as kb
 import Connection as Cn
 import Language as Lang
-import keyboard as kb
+
 
 def choose_race(name, language):
     """Verify if character race and class exists, if not then let the player choose
@@ -10,33 +11,33 @@ def choose_race(name, language):
         Name: get the player name logged in \n
         language: get the language choose by player \n
         Return:\n
-        (Race like in DB), (Race in the language choose by player), (Class like in DB), (Class in the language choose by player \n
+        (Race like in DB), (Race in the language choose by player), (Class like in DB), (Class in the language choose
+        by player \n
         for unpacking this function example: RaceDB, DisplayRace, ClassDB, DisplayClass = ChooseRace(name, language)
         """
     races = ['DWARF', 'ELF', 'GNOME', 'HALF-ELF', 'HALF-ORC', 'HALFLING', 'HUMAN']
-    classes = ['BARBARIAN', 'BARD', 'CLERIC', 'DRUID', 'FIGHTER', 'MONK', 'PALADIN', 'RANGER', 'ROGUE', 'WIZARD', 'MAGE']
+    classes = ['BARBARIAN', 'BARD', 'CLERIC', 'DRUID', 'FIGHTER', 'MONK', 'PALADIN', 'RANGER', 'ROGUE', 'WIZARD',
+               'MAGE']
     try:
         query = f"Name = '{name}'"
         result = Cn.select_function('race', query)
         cod, name_r, race_r, class_r = result[0]
         race = races.index(race_r)
         class_index = classes.index(class_r)
-        race_language, choose_text, success, class_display, choose_text2 = Lang.race_text(language)
+        race_language, choose_text, success, class_display, choose_text2 = Lang.race_language(language)
         return races[race], race_language[race], classes[class_index], class_display[class_index]
     except IndexError:
         display_races = str('')
         display_classes = str('')
-        race_language, choose_text, success, class_display, choose_text2 = Lang.race_text(language)
+        race_language, choose_text, success, class_display, choose_text2 = Lang.race_language(language)
         for i, race_lang in enumerate(race_language):
             display_races += str(f'{i} - {race_lang}  ')
-
         print(display_races)
         kb.press('backspace')
         race = int(input(choose_text))
         print(success.format(race_language[race]))
         for i2, class_lang in enumerate(class_display):
             display_classes += str(f'{i2} - {class_lang}  ')
-
         print(display_classes)
         class_input = int(input(choose_text2))
         Cn.insert_function('race', 'Name', 'Race', 'Class', name=f"{name}", race=f"{races[race]}",
@@ -46,6 +47,16 @@ def choose_race(name, language):
 
 
 def character_base_attributes(name, language, race_lang):
+    """Update character race attributes by using the the class index selected by the player in the function choose_race
+    and display the base attributes before the game starts
+
+            Parameters:\n
+            Name: get the player name logged in \n
+            language: get the language choose by player \n
+            race_lang: get the race index where player choose the class in function choose_race
+            Return:\n
+            if successful, it will return true
+            """
     # ['BARBARIAN', 'BARD', 'CLERIC', 'DRUID', 'FIGHTER', 'MONK', 'PALADIN', 'RANGER', 'ROGUE','WIZARD', 'MAGE']
     # Attributes Order str, dex, cons, int, wis, cha
     class_dict = {'BARBARIAN': [8, 3, 8, 1, 2, 3], 'BARD': [3, 2, 2, 6, 2, 10], 'CLERIC': [3, 3, 4, 3, 9, 3],

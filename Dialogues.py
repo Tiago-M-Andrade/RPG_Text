@@ -1,11 +1,7 @@
+import sys
 import time
 from os import system, name
-import sys
 import keyboard
-import Language as Lang
-import Connection as Cn
-import simpleaudio as sa
-import random
 from termcolor import colored
 
 
@@ -20,6 +16,7 @@ def clear():
 
 
 def text_speech(texts, delay):
+    # function for display letter by letter text
     for text in texts:
         sys.stdout.flush()
         sys.stdout.write(text)
@@ -36,6 +33,7 @@ def text_speech(texts, delay):
 
 
 def dialogue_system(dialogue, character_name, search_name):
+    # get dialogue and for each line of dialogue call the function text_speech to display letter by letter text
     lang_texts = dialogue
     i = 0
     for cod, location, text, lang, success in lang_texts:
@@ -46,7 +44,7 @@ def dialogue_system(dialogue, character_name, search_name):
             text_speech(text.replace(search_name, "{}").format(colored(search_name, 'green')), 0.02)
         else:
             text_speech(text, 0.02)
-        if (i) == len(lang_texts):
+        if i == len(lang_texts):
             break
         while True:
             if keyboard.is_pressed('space'):
